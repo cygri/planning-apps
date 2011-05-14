@@ -33,6 +33,8 @@
     <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.4.2/jquery.min.js"></script>
     <script type="text/javascript">
 var map;
+var data = [];
+
 function makemap()
 {
     var mapOptions = { "zoom": 13,
@@ -40,13 +42,14 @@ function makemap()
                        "mapTypeId": google.maps.MapTypeId.HYBRID
                      };
     map = new google.maps.Map(document.getElementById("map"), mapOptions);
+    for (i=0; i < data.length; i++) {
+        addMarker(data[i]);
+    }
 }
 
-function recorddata(record)
+function addMarker(record)
 {
-    if (!('latlng' in record))
-        return;
-    pos = new google.maps.LatLng(record['latlng'][0], record['latlng'][1]);
+    pos = new google.maps.LatLng(record.lat, record.lng);
     marker = new google.maps.Marker({position:pos, map:map});
     (function(j) {
         google.maps.event.addListener(j.marker, "click", function() {
@@ -55,39 +58,14 @@ function recorddata(record)
     })({'marker':marker, 'appref':record.appref});
 }
 
-var olength = 500;
-var olimit = 100;
-var offset = 0; 1    
-function gotback(r)
-{
-    for (i = 0; i < r.length; i++)
-        recorddata(r[i]);
-
-    offset += olength;
-    if ((r.length == olength) && (offset < olimit))
-        loaddata();
-    else
-        $("#message").html("Total records: " + (offset - olength + r.length));
-}
-
-function loaddata()
-{
-    $("#message").html("Loading ...");
-    var s = document.createElement('script');
-    url = "http://api.scraperwiki.com/api/1.0/datastore/getdata?&format=json&name=latest-galway-city-planning-applications&limit="+olength+"&callback=gotback&offset=" + offset;
-    s.setAttribute('src', url);
-    s.setAttribute('type', 'text/javascript');
-    document.getElementsByTagName('head')[0].appendChild(s);
-}
-
-$(function() { makemap(); loaddata(); });
+$(function() { makemap(); });
 
     </script>
 </head>
 
 <body id="top">
     <div id="feedicon"><a href="http://lab.linkeddata.deri.ie/2010/planning-apps/feed"><img src="http://lab.linkeddata.deri.ie/2010/planning-apps/feed-icon-28x28.png" alt="RSS feed" title="Subscribe to RSS feed" /></a></div>
-    <h1>Recent planning applications to Galway City Council <small id="message">...</small></h1>
+    <h1>Recent planning applications to Galway City Council</h1>
     <div id="content">
         <div id="galway-logo"><a href="http://www.galwaycity.ie/"><img src="http://lab.linkeddata.deri.ie/2010/planning-apps/galway-crest-100px.png" alt="Galway" /></a></div>
         <p><strong><em>What is this?</em></strong> This page shows all
@@ -116,12 +94,13 @@ $(function() { makemap(); loaddata(); });
     <div id="map"></div>
 <?php
 
-$sourcescraper = 'latest-galway-city-planning-applications';
-$start = date('Y-m-d', time() - 28 * 24 * 60 * 60);
-$end = date('Y-m-d', time() + 24 * 60 * 60);
-$data_url = "http://api.scraperwiki.com/api/1.0/datastore/getdatabydate?format=json&name=$sourcescraper&start_date=$start&end_date=$end";
-$applications = json_decode(file_get_contents($data_url));
-//$applications = scraperwiki::getData($sourcescraper);
+date_default_timezone_set('Eire');
+$max_age_days = 28;
+$max_entries = 20;
+$start = date('Y-m-d', time() - $max_age_days * 24 * 60 * 60);
+$query = "SELECT appref, date, url, address, applicant, details, lat, lng FROM swdata WHERE date >= '$start' ORDER BY date DESC LIMIT $max_entries";
+$data_url = 'http://api.scraperwiki.com/api/1.0/datastore/sqlite?format=jsondict&name=latest-galway-city-planning-applications&query=' . urlencode($query);
+$data = json_decode(file_get_contents($data_url));
 
 function e($s) {
   echo htmlspecialchars($s);
@@ -132,13 +111,14 @@ function autolink($text) {
   echo preg_replace('!(FS)/(\d\d?\d?)/?(\d\d)|(\d\d)/(\d\d?\d?)!', '<a href="http://gis.galwaycity.ie/ePlan/InternetEnquiry/rpt_ViewApplicDetails.asp?validFileNum=1&amp;app_num_file=$1$2$3$4$5">$0</a>', $text);
 }
 
-foreach ($applications as $app) { ?>
+foreach ($data as $app) { ?>
     <div class="application" id="_<?php e($app->appref); ?>">
         <h2><a href="<?php e($app->url); ?>"><?php e($app->address); ?> (#<?php e($app->appref); ?>)</a></h2>
-<?php if (isset($app->latlng)) { ?>
+<?php if (isset($app->lat)) { ?>
+        <script>data.push({appref:'<?php e($app->appref); ?>',lat:<?php e($app->lat); ?>,lng:<?php e($app->lng); ?>});</script>
         <div class="minimap">
             <a href="#top">
-                <img src="<?php e('http://maps.google.com/maps/api/staticmap?size=200x200&zoom=16&maptype=hybrid&markers=size:mid|' . $app->latlng[0] . ',' . $app->latlng[1]. '&sensor=false'); ?>" />
+                <img src="<?php e('http://maps.google.com/maps/api/staticmap?size=200x200&zoom=16&maptype=hybrid&markers=size:mid|' . $app->lat . ',' . $app->lng . '&sensor=false'); ?>" />
             </a>
         </div>
 <?php } else { ?>
