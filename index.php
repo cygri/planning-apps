@@ -72,7 +72,7 @@ $(function() { makemap(); });
             <strong><a href="http://www.galwaycity.ie/AllServices/Planning/">planning applications</a>
             submitted to Galway City Council</strong> within the last four weeks. There is also a
             <strong><a href="http://lab.linkeddata.deri.ie/2010/planning-apps/feed"><img class="inline" src="http://lab.linkeddata.deri.ie/2010/planning-apps/feed-icon-14x14.png" alt=""> live RSS feed</a></strong>
-            of the latest submission. You can subscribe to the feed using any RSS reader,
+            of the latest submissions. You can subscribe to the feed using any RSS reader,
             such as <a href="http://www.google.com/reader/">Google Reader</a>.</p>
         <p><strong><em>How does it work?</em></strong> These are search results from the City Council's
             <a href="http://gis.galwaycity.ie/ePlan/InternetEnquiry/rpt_QueryBySurForRecLoc.asp">ePlan system</a>,
@@ -81,7 +81,8 @@ $(function() { makemap(); });
             built using the awesome <a href="http://scraperwiki.com/">ScraperWiki platform</a>.</p>
         <p><strong><em>Who made this?</em></strong> This page was made during the
             <strong><a href="http://www.opendataday.org/">International Open Data Hackathon</a></strong>
-            on December 4/5 2010 by a team at <strong>NUI Galway's <a href="http://www.deri.ie/">DERI</a></strong>.
+            on December 4/5 2010 by a team at <strong>NUI Galway's <a href="http://www.deri.ie/">DERI</a></strong>,
+            and further improved at subsequent hack days.
             It is based on a <a href="http://scraperwiki.com/scrapers/ie_planningalerts_corkcity/">scraper
             for Cork City planning applications</a> made earlier by
             <a href="http://handelaar.org/">John Handelaar</a> and adapted for Galway by
@@ -96,7 +97,7 @@ $(function() { makemap(); });
 
 date_default_timezone_set('Eire');
 $max_age_days = 28;
-$max_entries = 20;
+$max_entries = 50;
 $start = date('Y-m-d', time() - $max_age_days * 24 * 60 * 60);
 $query = "SELECT appref, date, url, address, applicant, details, lat, lng FROM swdata WHERE date >= '$start' ORDER BY date DESC LIMIT $max_entries";
 $data_url = 'http://api.scraperwiki.com/api/1.0/datastore/sqlite?format=jsondict&name=latest-galway-city-planning-applications&query=' . urlencode($query);
