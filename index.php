@@ -114,7 +114,7 @@ function autolink($text) {
 
 foreach ($data as $app) { ?>
     <div class="application" id="_<?php e($app->appref); ?>">
-        <h2><a href="<?php e($app->url); ?>"><?php e($app->address); ?> (#<?php e($app->appref); ?>)</a></h2>
+        <h2><a href="<?php e($app->url); ?>"><?php e(str_replace("\n", ', ', $app->address)); ?> (#<?php e($app->appref); ?>)</a></h2>
 <?php if (isset($app->lat)) { ?>
         <script>data.push({appref:'<?php e($app->appref); ?>',lat:<?php e($app->lat); ?>,lng:<?php e($app->lng); ?>});</script>
         <div class="minimap">
