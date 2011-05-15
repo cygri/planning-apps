@@ -45,8 +45,8 @@ $sites = array(
         'url' => "http://www.donegal.ie/letterkenny_eplan/internetenquiry/",
         'homepage' => 'rpt_querybysurforrecloc.asp',
     ),
-    'LimerickCity' => array(
-        'name' => 'Limerick City Council',
+    'LimerickCo' => array(
+        'name' => 'Limerick County Council',
         'system' => 'ePlan classic',
         'url' => "http://www.lcc.ie/ePlan/InternetEnquiry/",
         'homepage' => '',
@@ -117,7 +117,7 @@ th, td { padding: 0.2em 0.4em; }
         <td><strong>All</strong></td>
         <td>–</td>
         <td><a href="http://scraperwikiviews.com/run/irish_planning_applications_feed/?county=all">Atom</a></td>
-        <td>–</td>
+        <td><a href="http://scraperwikiviews.com/run/irish_planning_applications_map/">Map</a></td>
       </tr>
     </table>
     <p>Do you want to help adding more councils? Then get in touch on the <a href="https://groups.google.com/group/open-data-ireland">Open Data Ireland</a> Google Group mailing list!</p>
